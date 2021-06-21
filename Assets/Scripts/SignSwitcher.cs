@@ -3,43 +3,67 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
+using System;
 
 public class SignSwitcher : MonoBehaviour
 {
     public Sprite redSign, greenSign, btnUnpressed, btnPressed;
     float timeToSwitch = 3f, reduceFactor = 1.1f;
     public Image signImage, slickBImage;
-    public Button blueB;
-    bool buttonPressed;
+    bool buttonPressed, pressedOnce;
+    AudioSource soundPlayer;
+    public AudioClip buttonSound, signSound, gameOverSound;
+    public TextMeshProUGUI slickResult;
+    public GameObject deathP;
 
     // Start is called before the first frame update
     void Start()
     {
-        blueB.onClick.AddListener(() => { buttonPressed = true; slickBImage.sprite = btnPressed; });
+        soundPlayer = gameObject.AddComponent<AudioSource>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.touchCount > 0 && !pressedOnce)
+        {
+            buttonPressed = true;
+            slickBImage.sprite = btnPressed;
+            soundPlayer.PlayOneShot(buttonSound);
+            pressedOnce = true;
+        }
+
         if (signImage.sprite == redSign && buttonPressed) {
-            blueB.enabled = false; 
+            soundPlayer.PlayOneShot(gameOverSound);
+            deathP.SetActive(true);
             enabled = false;
         }
 
         if (timeToSwitch > 0f) timeToSwitch -= Time.deltaTime;
         else
         {
-            if (signImage.sprite == greenSign) {
+            if (signImage.sprite == greenSign)
+            {
                 signImage.sprite = redSign;
-                if (buttonPressed) {
+                pressedOnce = false;
+                if (buttonPressed)
+                {
                     buttonPressed = false;
                     slickBImage.sprite = btnUnpressed;
-                } else {
-                    blueB.enabled = false;
+                    slickResult.SetText($"You are {Math.Round(reduceFactor * 2, 2)}% slick");
+                }
+                else
+                {
+                    soundPlayer.PlayOneShot(gameOverSound);
+                    deathP.SetActive(true);
                     enabled = false;
                 }
             }
-            else if (!buttonPressed) signImage.sprite = greenSign;
+            else if (!buttonPressed) { 
+                signImage.sprite = greenSign;
+                soundPlayer.PlayOneShot(signSound);
+            }
 
             timeToSwitch = 3f / reduceFactor;
             reduceFactor += 0.1f;

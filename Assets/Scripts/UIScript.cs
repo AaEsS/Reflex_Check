@@ -16,4 +16,6 @@ public class UIScript : MonoBehaviour
     {
         if (Input.GetKeyDown("r")) SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+
+    public void RestartTest() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 }
