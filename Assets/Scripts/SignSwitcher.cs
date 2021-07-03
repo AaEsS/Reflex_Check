@@ -14,12 +14,14 @@ public class SignSwitcher : MonoBehaviour
     bool buttonPressed, pressedOnce;
     AudioSource soundPlayer;
     public AudioClip buttonSound, signSound, gameOverSound;
-    public TextMeshProUGUI slickResult;
+    float result = 0f;
+    public TextMeshProUGUI slickResult, bestResult;
     public GameObject deathP;
 
     // Start is called before the first frame update
     void Start()
     {
+        bestResult.SetText($"Best result: {PlayerPrefs.GetFloat("BestSlickness", 0f)}% slick");
         soundPlayer = gameObject.AddComponent<AudioSource>();
     }
 
@@ -51,7 +53,10 @@ public class SignSwitcher : MonoBehaviour
                 {
                     buttonPressed = false;
                     slickBImage.sprite = btnUnpressed;
-                    slickResult.SetText($"You are {Math.Round(reduceFactor * 2, 2)}% slick");
+                    result = (float)Math.Round(reduceFactor * 2, 2);
+                    slickResult.SetText($"You are {result}% slick");
+                    if (PlayerPrefs.GetFloat("BestSlickness") < result) PlayerPrefs.SetFloat("BestSlickness", result);
+                    bestResult.SetText($"Best result: {PlayerPrefs.GetFloat("BestSlickness")}% slick");
                 }
                 else
                 {
